@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/validaciones")
 @RequiredArgsConstructor
@@ -45,16 +46,14 @@ public class ValidacionController {
     @PostMapping("/rechazar")
     public ResponseEntity<Void> rechazarFormulario(
             @RequestParam Integer idFormulario,
-            @RequestParam String observacion
-    ) {
+            @RequestParam String observacion) {
         validacionService.rechazarFormulario(idFormulario, observacion);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/aprobar")
     public ResponseEntity<Void> aprobarFormulario(
-            @RequestParam Integer idFormulario
-    ) {
+            @RequestParam Integer idFormulario) {
         validacionService.aprobarFormulario(idFormulario);
         return ResponseEntity.noContent().build();
     }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/materias")
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class MateriaController {
     // Actualizar una materia
     @PutMapping("/{id}")
     public ResponseEntity<MateriaResponse> updateMateria(@PathVariable Integer id,
-                                                         @Valid @RequestBody MateriaRequest materiaRequest) {
+            @Valid @RequestBody MateriaRequest materiaRequest) {
         materiaRequest.setIdMateria(id);
         MateriaResponse materiaActualizada = materiaService.update(materiaRequest);
         return ResponseEntity.ok(materiaActualizada);
