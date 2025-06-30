@@ -62,7 +62,29 @@ public class AuthRole {
                         .requestMatchers("/api/actividades/**").hasRole("ENCARGADO") // POST, PUT, DELETE solo para ENCARGADO
                         .requestMatchers(HttpMethod.GET, "/api/materias").hasAnyRole("ENCARGADO", "INSTRUCTOR_NORMAL", "INSTRUCTOR_REMUNERADO")
                         .requestMatchers("/api/materias/**").hasRole("ENCARGADO") // POST, PUT, DELETE solo para ENCARGADO
-                        .requestMatchers("/api/usuarios/**").hasRole("ENCARGADO")
+                        
+                        // Endpoints de administración de usuarios (solo ENCARGADO)
+                        .requestMatchers("/api/usuarios/list").hasRole("ENCARGADO")
+                        .requestMatchers("/api/usuarios/materia").hasRole("ENCARGADO")
+                        .requestMatchers("/api/usuarios/codigo/**").hasRole("ENCARGADO")
+                        .requestMatchers("/api/usuarios/rol").hasRole("ENCARGADO")
+                        .requestMatchers("/api/usuarios/update/**").hasRole("ENCARGADO")
+                        .requestMatchers("/api/usuarios/delete/**").hasRole("ENCARGADO")
+                        
+                        // Endpoint para obtener datos del usuario autenticado (cualquier usuario autenticado)
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/data/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
+                        
+                        // Endpoints de usuario-materias (usuarios autenticados)
+                        .requestMatchers(HttpMethod.GET, "/api/usuario-materias/**").authenticated()
+                        .requestMatchers("/api/usuario-materias/**").hasRole("ENCARGADO") // POST, PUT, DELETE solo para ENCARGADO
+                        
+                        // Endpoints de registros (usuarios autenticados)
+                        .requestMatchers(HttpMethod.GET, "/api/registros/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/registros/**").hasAnyRole("ENCARGADO", "INSTRUCTOR_NORMAL", "INSTRUCTOR_REMUNERADO")
+                        .requestMatchers(HttpMethod.PUT, "/api/registros/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/registros/**").authenticated()
+                        
                         .requestMatchers("/api/roles/**").hasRole("ENCARGADO")
                         .requestMatchers("/api/manage/horas/usuario/fecha").hasRole("ENCARGADO")
 

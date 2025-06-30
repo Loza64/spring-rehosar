@@ -74,6 +74,11 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario not found")));
     }
 
+    @Override
+    public UsuarioResponse findByEmail(String email) {
+        return UsuarioMapper.toDTO(usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario not found")));
+    }
 
     @Override
     public UsuarioResponse save(UsuarioRequest usuario) {

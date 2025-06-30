@@ -3,6 +3,7 @@ package com.pnc.project.controllers;
 import com.pnc.project.dto.request.registro_hora.Registro_HoraRequest;
 import com.pnc.project.dto.response.registro_hora.Registro_HoraResponse;
 import com.pnc.project.service.Registro_HoraService;
+import com.pnc.project.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class Registro_HoraController {
 
     private final Registro_HoraService registroHoraService;
+    private final UsuarioService usuarioService;
 
-    public Registro_HoraController(Registro_HoraService registroHoraService) {
+    public Registro_HoraController(Registro_HoraService registroHoraService, UsuarioService usuarioService) {
         this.registroHoraService = registroHoraService;
+        this.usuarioService = usuarioService;
     }
 
     // Obtener todos los registros de horas
@@ -69,5 +72,24 @@ public class Registro_HoraController {
                 idUsuario, fechaInicio, fechaFin
         );
         return ResponseEntity.ok(registros);
+    }
+
+    // Listar registros por rango de fechas y código de usuario
+    @GetMapping("/manage/horas/usuario/codigo/fecha")
+    public ResponseEntity<List<Registro_HoraResponse>> findByDateRangeAndUsuarioCodigo(
+            @RequestParam("codigoUsuario") String codigoUsuario,
+            @RequestParam("fechaInicio") String fechaInicio,
+            @RequestParam("fechaFin") String fechaFin
+    ) {
+        try {
+            // Buscar el usuario por código
+            var usuario = usuarioService.findByCodigo(codigoUsuario);
+            List<Registro_HoraResponse> registros = registroHoraService.dateListByUsuarioAndRange(
+                    usuario.getIdUsuario(), fechaInicio, fechaFin
+            );
+            return ResponseEntity.ok(registros);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

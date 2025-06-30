@@ -28,14 +28,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-      private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+
     private final UsuarioService usuarioService;
     private final JwtConfig jwtConfig;
-    private final ObjectMapper objectMapper; // Añade esto para manejar JSON
+    private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = extractToken(request);
 
@@ -53,16 +55,16 @@ public class JwtFilter extends OncePerRequestFilter {
             UsuarioResponse usuario = usuarioService.findById(idUser);
 
             UserDetails userDetails = User.builder()
-                .username(usuario.getCorreo())
-                .password("")
-                .roles(String.valueOf(usuario.getRol()))
-                .build();
+                    .username(usuario.getCorreo())
+                    .password("")
+                    .roles(String.valueOf(usuario.getRol()))
+                    .build();
 
             UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -70,7 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            logger.error("Error en autenticación JWT", e);
+            logger.error("JWT Error → {}", e.getMessage());
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Autenticación fallida: " + e.getMessage());
         }
     }
@@ -87,12 +89,18 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(
-            Map.of(
-                "status", status.value(),
-                "error", status.getReasonPhrase(),
-                "message", message,
-                "timestamp", Instant.now().toString()
-            )
+                Map.of(
+                        "status", status.value(),
+                        "error", status.getReasonPhrase(),
+                        "message", message,
+                        "timestamp", Instant.now().toString()
+                )
         ));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/auth");
     }
 }

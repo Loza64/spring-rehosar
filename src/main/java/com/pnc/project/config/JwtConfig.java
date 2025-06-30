@@ -6,7 +6,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,22 +18,20 @@ import java.util.Map;
 public class JwtConfig {
 
     @Value("${security.jwt.expiration-time}")
-    private int tokenTime; // One hour token time
+    private int tokenTime;
 
     @Value("${security.jwt.secret-key}")
-    private String tokenSecret; // Token secret
+    private String tokenSecret;
 
     private SecretKey getTokenKey() {
         byte[] keyBytes = Decoders.BASE64.decode(tokenSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Create token
     public String createToken(UsuarioResponse user) {
         Map<String, Object> json = new LinkedHashMap<>();
         json.put("id", user.getIdUsuario());
-        return Jwts
-                .builder()
+        return Jwts.builder()
                 .claims(json)
                 .signWith(getTokenKey())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -44,8 +41,7 @@ public class JwtConfig {
 
     public Claims extracClaims(String token) {
         try {
-            return Jwts
-                    .parser()
+            return Jwts.parser()
                     .verifyWith(getTokenKey())
                     .build()
                     .parseSignedClaims(token)
@@ -59,5 +55,4 @@ public class JwtConfig {
         Claims claims = extracClaims(token);
         return claims == null || claims.getExpiration().before(new Date());
     }
-
 }

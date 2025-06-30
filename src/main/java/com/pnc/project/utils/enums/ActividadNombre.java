@@ -4,7 +4,7 @@ import static com.pnc.project.utils.enums.RolNombre.*;
 
 public enum ActividadNombre {
 
-    /* INSTRUCTOR_NORMAL */
+    /* INSTRUCTOR_SOCIAL */
     APOYO_PRACTICAS_LABORATORIO(INSTRUCTOR_NORMAL),
     CONSULTAS(INSTRUCTOR_NORMAL),
     APOYO_CLASE(INSTRUCTOR_NORMAL),

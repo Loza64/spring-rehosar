@@ -13,10 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -39,11 +42,36 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
 
-    // Obtener usuario por ID
+    // Obtener datos del usuario autenticado actual
+    @GetMapping("/usuarios/me")
+    public ResponseEntity<UsuarioResponse> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();
+            UsuarioResponse usuario = usuarioService.findByEmail(email);
+            if (usuario != null) {
+                return ResponseEntity.ok(usuario);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    // Obtener usuario por ID (solo para usuarios autenticados)
     @GetMapping("/usuarios/data/{id}")
     public ResponseEntity<UsuarioResponse> findById(@PathVariable int id) {
-        UsuarioResponse usuario = usuarioService.findById(id);
-        return ResponseEntity.ok(usuario);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Verificar que el usuario está solicitando sus propios datos o tiene permisos de administrador
+            String email = authentication.getName();
+            UsuarioResponse currentUser = usuarioService.findByEmail(email);
+            
+            if (currentUser != null && (currentUser.getIdUsuario() == id || 
+                "ENCARGADO".equals(currentUser.getRol()))) {
+                UsuarioResponse usuario = usuarioService.findById(id);
+                return ResponseEntity.ok(usuario);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     // Obtener usuario por código
@@ -83,6 +111,7 @@ public class UsuarioController {
     }
 
     // Login de usuario
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/auth/login")
     public ResponseEntity<Object> login(@Valid @RequestBody  Login body) {
         UsuarioResponse user = usuarioService.login(body.getEmail(), body.getPassword());

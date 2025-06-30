@@ -19,6 +19,8 @@ public interface UsuarioService {
     UsuarioResponse findById(int id);
     //Obtener usuario por código
     UsuarioResponse findByCodigo(String codigo);
+    //Obtener usuario por email
+    UsuarioResponse findByEmail(String email);
     //Obtener usuario por rol
     List<UsuarioResponse> findByRolId(Integer rolId);
 
