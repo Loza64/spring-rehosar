@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://rehosar.vercel.app")
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -111,7 +111,7 @@ public class UsuarioController {
     }
 
     // Login de usuario
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "https://rehosar.vercel.app")
     @PostMapping("/auth/login")
     public ResponseEntity<Object> login(@Valid @RequestBody  Login body) {
         UsuarioResponse user = usuarioService.login(body.getEmail(), body.getPassword());
