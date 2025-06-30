@@ -32,4 +32,6 @@ public interface ValidacionService {
     // Rechazar un formulario por ID con observación
     void rechazarFormulario(Integer idFormulario, String observacion);
 
+    void aprobarFormulario(Integer idFormulario);
+
 }

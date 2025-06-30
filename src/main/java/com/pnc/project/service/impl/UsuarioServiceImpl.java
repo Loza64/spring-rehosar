@@ -88,8 +88,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponse update(UsuarioRequest usuario) {
+        // Obtener el usuario existente
+        Usuario usuarioExistente = usuarioRepository.findById(usuario.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario not found"));
+        
         RolResponse rol = rolService.findByName(usuario.getRol());
-        return UsuarioMapper.toDTO(usuarioRepository.save(UsuarioMapper.toEntityUpdate(usuario, RolMapper.toEntity(rol))));
+        
+        // Actualizar solo los campos proporcionados
+        usuarioExistente.setCodigoUsuario(usuario.getCodigoUsuario());
+        usuarioExistente.setNombre(usuario.getNombre());
+        usuarioExistente.setApellido(usuario.getApellido());
+        usuarioExistente.setEmail(usuario.getCorreo());
+        usuarioExistente.setRol(RolMapper.toEntity(rol));
+        
+        // Solo actualizar la contraseña si se proporciona una nueva
+        if (usuario.getContrasena() != null && !usuario.getContrasena().trim().isEmpty()) {
+            usuarioExistente.setPassword(passwordEncoder.encode(usuario.getContrasena()));
+        }
+        
+        return UsuarioMapper.toDTO(usuarioRepository.save(usuarioExistente));
     }
 
     @Override

@@ -20,6 +20,11 @@ public class MateriaServiceImpl implements MateriaService {
     @Override
     public List<MateriaResponse> findAll() {return MateriaMapper.toDTOList(materiaRepository.findAll());}
 
+    @Override
+    public MateriaResponse findById(int id) {
+        return MateriaMapper.toDTO(materiaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Materia not found")));
+    }
 
     @Override
     public MateriaResponse save(MateriaRequest materia) {

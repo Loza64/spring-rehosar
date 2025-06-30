@@ -1,5 +1,6 @@
 package com.pnc.project.dto.request.registro_hora;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +16,15 @@ public class Registro_HoraRequest {
     private Integer idRegistro;
 
     @NotNull(message = "La fecha de registro no puede ser nula")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaRegistro;
 
     @NotNull(message = "La hora de inicio no puede ser nula")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime horaInicio;
 
     @NotNull(message = "La hora de fin no puede ser nula")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime horaFin;
 
     @NotNull(message = "Las horas efectivas no pueden ser nulas")

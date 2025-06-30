@@ -50,4 +50,12 @@ public class ValidacionController {
         validacionService.rechazarFormulario(idFormulario, observacion);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/aprobar")
+    public ResponseEntity<Void> aprobarFormulario(
+            @RequestParam Integer idFormulario
+    ) {
+        validacionService.aprobarFormulario(idFormulario);
+        return ResponseEntity.noContent().build();
+    }
 }

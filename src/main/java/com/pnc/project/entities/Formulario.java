@@ -33,4 +33,8 @@ public class Formulario {
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
     private Usuario usuario;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_materia", referencedColumnName = "id_materia")
+    private Materia materia;
+
 }

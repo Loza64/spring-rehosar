@@ -31,4 +31,11 @@ public interface Registro_HoraService {
     List<Registro_HoraResponse> dateList(Usuario usuario, LocalDate inicio, LocalDate fin);
 
     List<Registro_HoraResponse> dateListByUsuarioAndRange(int idUsuario, String fechaInicio, String fechaFin);
+
+    // Nuevos métodos para el flujo de validaciones
+    List<Registro_HoraResponse> findPendientes();
+    List<Registro_HoraResponse> findValidados();
+    List<Registro_HoraResponse> findByEstado(String estado);
+    Registro_HoraResponse aprobarRegistro(int id);
+    Registro_HoraResponse denegarRegistro(int id, String observacion);
 }

@@ -23,7 +23,7 @@ public class UsuarioXMateria {
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_materia", referencedColumnName = "id_materia")
     private Materia materia;
 

@@ -22,4 +22,6 @@ public class FormularioRequest {
 
     @NotNull(message = "El código de usuario no puede ser nulo")
     private String codigoUsuario;
+
+    private Integer idMateria;
 }

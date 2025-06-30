@@ -56,6 +56,7 @@ public class AuthRole {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/save").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/registros/test/horas").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") .permitAll()
                         
                         .requestMatchers(HttpMethod.GET, "/api/actividades/**").hasAnyRole("ENCARGADO", "INSTRUCTOR_NORMAL", "INSTRUCTOR_REMUNERADO")

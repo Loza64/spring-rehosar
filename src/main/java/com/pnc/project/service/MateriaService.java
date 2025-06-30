@@ -9,6 +9,9 @@ public interface MateriaService {
     //Listar materias
     List<MateriaResponse> findAll();
 
+    //Obtener materia por ID
+    MateriaResponse findById(int id);
+
     //Crear materia
     MateriaResponse save(MateriaRequest materia);
     //Actualiza materia

@@ -13,4 +13,5 @@ public class FormularioResponse {
     private LocalDate fechaCreacion;
     private EstadoFormulario estado;      // ← enum en lugar de String
     private String codigoUsuario;
+    private Integer idMateria;
 }

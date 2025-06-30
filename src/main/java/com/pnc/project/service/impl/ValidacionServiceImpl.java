@@ -121,6 +121,28 @@ public class ValidacionServiceImpl implements ValidacionService {
         validacionRepository.save(validacion);
     }
 
+    @Override
+    @Transactional
+    public void aprobarFormulario(Integer idFormulario) {
+
+        Formulario formulario = formularioRepository.findById(idFormulario)
+                .orElseThrow(() -> new RuntimeException("Formulario no encontrado"));
+
+        /* 1) Cambiar estado del formulario */
+        formulario.setEstado(EstadoFormulario.APROBADO);
+        formularioRepository.save(formulario);
+
+        /* 2) Crear la validación asociada */
+        Validacion validacion = Validacion.builder()
+                .fechaValidacion(LocalDate.now())
+                .estado(EstadoValidacion.APROBADA)
+                .formulario(formulario)
+                .usuario(null)    // TODO: asigna el usuario que aprueba, si aplica
+                .build();
+
+        validacionRepository.save(validacion);
+    }
+
     // Métodos auxiliares
 
     private Usuario obtenerUsuarioDesdeCodigo(String codigoUsuario) {

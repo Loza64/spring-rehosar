@@ -84,6 +84,12 @@ public final class Registro_HoraMapper {
      *   4) Entity  ->  Response
      * ------------------------------------------------------------------ */
     public static Registro_HoraResponse toDTO(Registro_Hora rh) {
+        // Obtener la materia del formulario
+        String nombreMateria = "";
+        if (rh.getFormulario() != null && rh.getFormulario().getMateria() != null) {
+            nombreMateria = rh.getFormulario().getMateria().getNombreMateria();
+        }
+        
         return Registro_HoraResponse.builder()
                 .idRegistro(rh.getIdRegistroHora())
                 .fechaRegistro(rh.getFechaRegistro())
@@ -94,6 +100,8 @@ public final class Registro_HoraMapper {
                 .codigoUsuario(rh.getUsuario().getCodigoUsuario())
                 .nombreActividad(rh.getActividad().getNombre())          // enum
                 .idFormulario(rh.getFormulario().getIdFormulario())
+                .nombreMateria(nombreMateria)
+                .estado(rh.getFormulario() != null ? rh.getFormulario().getEstado() : null)
                 .build();
     }
 

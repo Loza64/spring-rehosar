@@ -37,15 +37,15 @@ public class Registro_Hora {
     @Column(name = "aula")
     private String aula;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_actividad", referencedColumnName = "id_actividad")
     private Actividad actividad;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_formulario", referencedColumnName = "id_formulario")
     private Formulario formulario;
 }

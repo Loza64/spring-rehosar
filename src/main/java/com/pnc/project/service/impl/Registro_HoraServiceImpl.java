@@ -1,6 +1,7 @@
 package com.pnc.project.service.impl;
 
 import com.pnc.project.dto.request.registro_hora.Registro_HoraRequest;
+import com.pnc.project.dto.request.formulario.FormularioRequest;
 import com.pnc.project.dto.response.actividad.ActividadResponse;
 import com.pnc.project.dto.response.formulario.FormularioResponse;
 import com.pnc.project.dto.response.registro_hora.Registro_HoraResponse;
@@ -14,6 +15,7 @@ import com.pnc.project.service.ActividadService;
 import com.pnc.project.service.FormularioService;
 import com.pnc.project.service.Registro_HoraService;
 import com.pnc.project.service.UsuarioService;
+import com.pnc.project.utils.enums.EstadoFormulario;
 import com.pnc.project.utils.mappers.ActividadMapper;
 import com.pnc.project.utils.mappers.FormularioMapper;
 import com.pnc.project.utils.mappers.Registro_HoraMapper;
@@ -57,6 +59,10 @@ public class Registro_HoraServiceImpl implements Registro_HoraService {
 
     @Override
     public Registro_HoraResponse save(Registro_HoraRequest registroHora) {
+        System.out.println("=== DEBUG: Guardando registro ===");
+        System.out.println("Fecha recibida: " + registroHora.getFechaRegistro());
+        System.out.println("Tipo de fecha: " + (registroHora.getFechaRegistro() != null ? registroHora.getFechaRegistro().getClass().getName() : "null"));
+        
         UsuarioResponse usuarioDto = usuarioService.findByCodigo(registroHora.getCodigoUsuario());
         ActividadResponse actividadDto = actividadService.findById(registroHora.getIdActividad());
         FormularioResponse formularioDto = formularioService.findById(registroHora.getIdFormulario());
@@ -66,14 +72,24 @@ public class Registro_HoraServiceImpl implements Registro_HoraService {
         Formulario formulario = FormularioMapper.toEntity(formularioDto);
 
         Registro_Hora entity = Registro_HoraMapper.toEntityCreate(registroHora, usuario, actividad, formulario);
+        
+        System.out.println("Fecha en entidad: " + entity.getFechaRegistro());
+        System.out.println("Tipo de fecha en entidad: " + (entity.getFechaRegistro() != null ? entity.getFechaRegistro().getClass().getName() : "null"));
 
-        return Registro_HoraMapper.toDTO(registro_HoraRepository.save(entity));
+        Registro_Hora savedEntity = registro_HoraRepository.save(entity);
+        System.out.println("Fecha guardada: " + savedEntity.getFechaRegistro());
+        
+        Registro_HoraResponse response = Registro_HoraMapper.toDTO(savedEntity);
+        System.out.println("Fecha en respuesta: " + response.getFechaRegistro());
+        System.out.println("=== FIN DEBUG ===");
+        
+        return response;
     }
 
     @Override
     public Registro_HoraResponse update(Registro_HoraRequest registroHora) {
 
-        Registro_Hora existente = registro_HoraRepository.findById(registroHora.getIdFormulario())
+        Registro_Hora existente = registro_HoraRepository.findById(registroHora.getIdRegistro())
                 .orElseThrow(() -> new RuntimeException("Registro de hora no encontrado"));
 
         UsuarioResponse usuarioDto = usuarioService.findByCodigo(registroHora.getCodigoUsuario());
@@ -153,6 +169,74 @@ public class Registro_HoraServiceImpl implements Registro_HoraService {
         return Registro_HoraMapper.toDTOList(registros);
     }
 
+    @Override
+    public List<Registro_HoraResponse> findPendientes() {
+        List<Registro_Hora> registros = registro_HoraRepository.findByFormulario_Estado(EstadoFormulario.PENDIENTE);
+        return Registro_HoraMapper.toDTOList(registros);
+    }
 
+    @Override
+    public List<Registro_HoraResponse> findValidados() {
+        List<Registro_Hora> registros = registro_HoraRepository.findByFormulario_EstadoIn(List.of(EstadoFormulario.APROBADO, EstadoFormulario.DENEGADO));
+        return Registro_HoraMapper.toDTOList(registros);
+    }
+
+    @Override
+    public List<Registro_HoraResponse> findByEstado(String estado) {
+        EstadoFormulario estadoEnum;
+        try {
+            estadoEnum = EstadoFormulario.valueOf(estado.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Estado no válido: " + estado);
+        }
+        List<Registro_Hora> registros = registro_HoraRepository.findByFormulario_Estado(estadoEnum);
+        return Registro_HoraMapper.toDTOList(registros);
+    }
+
+    @Override
+    public Registro_HoraResponse aprobarRegistro(int id) {
+        Registro_Hora registro = registro_HoraRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registro de hora no encontrado"));
+        
+        // Actualizar el estado del formulario a APROBADO
+        Formulario formulario = registro.getFormulario();
+        formulario.setEstado(EstadoFormulario.APROBADO);
+        
+        // Crear un FormularioRequest para actualizar
+        FormularioRequest formularioRequest = FormularioRequest.builder()
+                .idFormulario(formulario.getIdFormulario())
+                .fechaCreacion(formulario.getFechaCreacion())
+                .estado(EstadoFormulario.APROBADO)
+                .codigoUsuario(formulario.getUsuario().getCodigoUsuario())
+                .idMateria(formulario.getMateria() != null ? formulario.getMateria().getIdMateria() : null)
+                .build();
+        
+        formularioService.update(formularioRequest);
+        
+        return Registro_HoraMapper.toDTO(registro);
+    }
+
+    @Override
+    public Registro_HoraResponse denegarRegistro(int id, String observacion) {
+        Registro_Hora registro = registro_HoraRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registro de hora no encontrado"));
+        
+        // Actualizar el estado del formulario a DENEGADO
+        Formulario formulario = registro.getFormulario();
+        formulario.setEstado(EstadoFormulario.DENEGADO);
+        
+        // Crear un FormularioRequest para actualizar
+        FormularioRequest formularioRequest = FormularioRequest.builder()
+                .idFormulario(formulario.getIdFormulario())
+                .fechaCreacion(formulario.getFechaCreacion())
+                .estado(EstadoFormulario.DENEGADO)
+                .codigoUsuario(formulario.getUsuario().getCodigoUsuario())
+                .idMateria(formulario.getMateria() != null ? formulario.getMateria().getIdMateria() : null)
+                .build();
+        
+        formularioService.update(formularioRequest);
+        
+        return Registro_HoraMapper.toDTO(registro);
+    }
 
 }
