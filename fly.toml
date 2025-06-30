@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for spring-rehosar on 2025-06-30T10:39:44-06:00
+# fly.toml app configuration file generated for spring-rehosar-white-voice-2707 on 2025-06-30T12:23:20-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'spring-rehosar'
+app = 'spring-rehosar-white-voice-2707'
 primary_region = 'mia'
 
 [build]
