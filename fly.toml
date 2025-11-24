@@ -1,16 +1,12 @@
-# fly.toml app configuration file generated for rehosar-server on 2025-06-30T15:03:15-06:00
+# fly.toml app configuration file generated for rehosar-server-pp on 2025-11-24T02:15:41Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'rehosar-server'
-primary_region = 'mia'
+app = 'rehosar-server-pp'
+primary_region = 'iad'
 
 [build]
-
-[[mounts]]
-  source = 'target'
-  destination = '/app/target'
 
 [http_service]
   internal_port = 4000
@@ -24,3 +20,4 @@ primary_region = 'mia'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 1024
