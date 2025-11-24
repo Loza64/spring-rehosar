@@ -20,6 +20,9 @@ public class JwtConfig {
     @Value("${security.jwt.expiration-time}")
     private int tokenTime;
 
+    @Value("${security.jwt.password-reset-expiration-time}")
+    private int passwordResetTokenTime;
+
     @Value("${security.jwt.secret-key}")
     private String tokenSecret;
 
@@ -51,8 +54,47 @@ public class JwtConfig {
         }
     }
 
+    public Integer extractIdUser(String token) {
+        Claims claims = extracClaims(token);
+        if (claims == null) {
+            return null;
+        }
+        return claims.get("id", Integer.class);
+    }
+
     public boolean isTokenExpired(String token) {
         Claims claims = extracClaims(token);
         return claims == null || claims.getExpiration().before(new Date());
+    }
+
+    /**
+     * Crea un token JWT para recuperación de contraseña con claims personalizados
+     * 
+     * @param email Email del usuario
+     * @return Token JWT con email y purpose: "password_reset"
+     */
+    public String createPasswordResetToken(String email) {
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("email", email);
+        json.put("purpose", "password_reset");
+        return Jwts.builder()
+                .claims(json)
+                .signWith(getTokenKey())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + passwordResetTokenTime))
+                .compact();
+    }
+
+    public String extractEmailFromPasswordResetToken(String token) {
+        Claims claims = extracClaims(token);
+        if (claims == null) {
+            return null;
+        }
+
+        String purpose = claims.get("purpose", String.class);
+        if (!"password_reset".equals(purpose)) {
+            return null;
+        }
+        return claims.get("email", String.class);
     }
 }
